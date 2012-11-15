@@ -1,20 +1,24 @@
 class Pawn < Piece
-  def legal(x_position, y_position)
-  	if x_position < self.x_position
+  attr_accessor :taking
+
+  def legal?(x, y, x_new, y_new)
+  	if y > y_new
   		false
-  	elsif x_position < 8 && y_position < 8
-  		if self.y_position.abs - y_position.abs > 1
-  			false
-  		elsif self.x_position.abs - x_position.abs > 1
-  			false
-  		elsif self.x_position - x_position < 2
-  			if self.y_position.abs - y_position.abs > 0
-  				:taking = true
-  				true
-  			else 
-  				:taking = false
-  				true
-  			end
+  	elsif (y_new - y).abs > 2
+  		false
+  	elsif (x_new - x).abs > 1
+  		false
+    elsif y_new == (y + 2)
+      #add en passant
+      true
+      @taking = false
+  	elsif y_new - y = 1
+  		if (x - x_new).abs > 0
+  			@taking = true
+  			true
+  		else 
+  			@taking = false
+  			true
   		end
     else 
     	false

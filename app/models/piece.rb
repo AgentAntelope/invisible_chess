@@ -1,15 +1,11 @@
 class Piece
-	attr_accessor :x_position, :y_position, :taking?
-	def intialise(colour = "black")
-	  @colour = colour
-	end
-		def move(x_position, y_position)
-    if legal?(x_position, y_position)
-    	@x_position = x_position
-    	@y_position = y_position
-    end
-	end
-	def legal?(x_position, y_position)
-		false
-	end
+	attr_accessor :colour
+
+	def initialize(colour)
+    @colour = colour
+  end
+
+  def legal?(x, y, x_new, y_new)
+  	true
+  end
 end
