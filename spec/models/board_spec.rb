@@ -109,39 +109,21 @@ describe Board do
     end
   end
 
-  describe "moving" do
-  	# a Piece can move anywhere on the board that is permitted to all pieces
-  	before :each do
-  		@board = Board.new
-  		@board.columns[7][7] = Piece.new(:white)
-  	end
-    describe "#can_move?" do
+  describe "#next_turn" do
+    before :each do
+      @board = Board.new
+    end
 
-    	it "should not let you move onto your own pieces" do
-    	  @board.can_move?(7, 7, 4, 4).should == true
-    	  @board.columns[4][4] = Piece.new(:white)
-    	  @board.can_move?(7, 7, 4, 4).should == false
-    	end
+    it "should go from white to black" do
+      @board.turn = :white
+      @board.next_turn
+      @board.turn.should == :black
+    end
 
-    	it "should let you move onto your opponents pieces" do
-    		@board.can_move?(7, 7, 4, 4).should == true
-    	  @board.columns[4][4] = Piece.new(:black)
-    	  @board.can_move?(7, 7, 4, 4).should == true
-    	end
-
-	    it "should only let you move on your turn" do
-	    	@board.can_move?(7, 7, 4, 4).should == true
-	      @board.turn = :black
-	      @board.can_move?(7, 7, 4, 4).should == false
-	    end
-
-	  	it "should not allow you to move off the board" do
-	  		@board.columns[7][7] = Piece.new(:white)
-	  		@board.can_move?(7, 7, 8, 8).should be_false
-	  		@board.can_move?(7, 7, 0, 8).should be_false
-	  		@board.can_move?(7, 7, 8, 0).should be_false
-	  		@board.can_move?(7, 7, 0, 0).should be_false
-	  	end
-	  end
+    it "should go from black to white" do
+      @board.turn = :black
+      @board.next_turn
+      @board.turn.should == :white
+    end
   end
 end

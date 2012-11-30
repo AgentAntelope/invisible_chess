@@ -1,12 +1,21 @@
 class Board
-	attr_accessor :columns, :turn
+	attr_accessor :columns, :turn, :old_columns, :taken
 
 	def initialize
 		blank_board
 		position_pieces(:white)
 		position_pieces(:black)
 		@turn = :white
+    @taken = []
 	end
+
+  def preserve_current_board
+    @columns_old = @columns
+  end
+
+  def restore_previous_board
+    @columns = @columns_old
+  end
 
   def blank_board
     @columns = []
@@ -28,11 +37,11 @@ class Board
   	case colour
   	  when :white
   	  	(0..7).each do |i|
-	  	  	@columns[i][1] = Pawn.new(:white)
+	  	  	@columns[i][1] = Pawn.new(:white, self)
   		  end
       when :black
   	  	(0..7).each do |i|
-	  	  	@columns[i][6] = Pawn.new(:black)
+	  	  	@columns[i][6] = Pawn.new(:black, self)
   		  end
     end
   end
@@ -40,60 +49,52 @@ class Board
   def position_rooks(colour)
   	case colour
   	  when :white then
-  	  @columns[0][0] = Rook.new(:white)
-  	  @columns[7][0] = Rook.new(:white)
+  	  @columns[0][0] = Rook.new(:white, self)
+  	  @columns[7][0] = Rook.new(:white, self)
   	  when :black then
-  	  @columns[0][7] = Rook.new(:black)
-  	  @columns[7][7] = Rook.new(:black)
+  	  @columns[0][7] = Rook.new(:black, self)
+  	  @columns[7][7] = Rook.new(:black, self)
     end
   end
 
   def position_knights(colour)
   	case colour
   	  when :white then
-  	  @columns[1][0] = Knight.new(:white)
-  	  @columns[6][0] = Knight.new(:white)
+  	  @columns[1][0] = Knight.new(:white, self)
+  	  @columns[6][0] = Knight.new(:white, self)
   	  when :black then
-  	  @columns[1][7] = Knight.new(:black)
-  	  @columns[6][7] = Knight.new(:black)
+  	  @columns[1][7] = Knight.new(:black, self)
+  	  @columns[6][7] = Knight.new(:black, self)
   	end
   end
 
   def position_bishops(colour)
   	case colour
   	  when :white then
-  	  @columns[2][0] = Bishop.new(:white)
-  	  @columns[5][0] = Bishop.new(:white)
+  	  @columns[2][0] = Bishop.new(:white, self)
+  	  @columns[5][0] = Bishop.new(:white, self)
   	  when :black then
-  	  @columns[2][7] = Bishop.new(:black)
-  	  @columns[5][7] = Bishop.new(:black)
+  	  @columns[2][7] = Bishop.new(:black, self)
+  	  @columns[5][7] = Bishop.new(:black, self)
   	end
   end
 
   def position_queen(colour)
   	case colour
   	  when :white then
-  	  @columns[3][0] = Queen.new(:white)
+  	  @columns[3][0] = Queen.new(:white, self)
   	  when :black then
- 		  @columns[3][7] = Queen.new(:black)
+ 		  @columns[3][7] = Queen.new(:black, self)
  		end
   end
 
   def position_king(colour)
   	case colour
   	  when :white then
-  	  @columns[4][0] = King.new(:white)
+  	  @columns[4][0] = King.new(:white, self)
   	  when :black then
-  	  @columns[4][7] = King.new(:black)
+  	  @columns[4][7] = King.new(:black, self)
   	end
-  end
-
-  def move(x, y, x_new, y_new)
-  	if can_move?(x, y, x_new, y_new)
-  		@board.columns[x_new][y_new] = @board.columns[x][y]
-  	end
-
-
   end
 
   def next_turn
@@ -103,23 +104,30 @@ class Board
     end
   end
 
-  def can_move?(x, y, x_new, y_new)
-  	if @columns[x][y].colour == @turn
-	  	if x_new <= 7 && y_new <= 7 && x_new >= 0 && y_new >= 0
-	  		if @columns[x_new][y_new]
-		  		if @columns[x][y].colour == @columns[x_new][y_new].colour
-		        false
-		      else
-		      	true
-		      end
-		    elsif @columns[x][y].legal?(x, y, x_new, y_new)
-		  	  true
-		    end
-	  	else
-	  		false
-	  	end
-	  else
-	  	false
-	  end
+  def legal_move?(x, y, x_new, y_new)
+    piece_at(x, y) && correct_turn(x, y) && in_bounds(x_new, y_new) && !matching_colours(x, y, x_new, y_new)
+  end
+
+  def in_bounds(x, y)
+    x <= 7 && y <= 7 && x >= 0 && y >= 0
+  end
+
+  def correct_turn(x, y)
+    piece_at(x, y).colour == @turn
+  end
+
+  def matching_colours(x, y, x_new, y_new)
+    @columns[x][y] && @columns[x_new][y_new] && @columns[x][y].colour == @columns[x_new][y_new].colour
+  end
+
+  def piece_at(x, y)
+    @columns[x][y]
+  end
+
+  def set_piece_at(x, y, piece)
+    if @columns[x][y]
+      @taken << @columns[x][y]
+    end
+    @columns[x][y] = piece
   end
 end
