@@ -1,26 +1,19 @@
 class Board
-	attr_accessor :columns, :turn, :old_columns, :taken
+	attr_accessor :columns, :turn, :taken, :size
 
-	def initialize
+	def initialize(size = 8)
 		blank_board
 		position_pieces(:white)
 		position_pieces(:black)
 		@turn = :white
     @taken = []
+    @size = size
 	end
 
-  def preserve_current_board
-    @columns_old = @columns
-  end
-
-  def restore_previous_board
-    @columns = @columns_old
-  end
-
-  def blank_board
+  def blank_board(size = 8)
     @columns = []
-    8.times do
-	    @columns << Array.new(8)
+    size.times do
+	    @columns << Array.new(size)
 	  end
   end
 
@@ -99,17 +92,17 @@ class Board
 
   def next_turn
   	case @turn
-    when :white then @turn = :black
-    when :black then @turn = :white
+      when :white then @turn = :black
+      when :black then @turn = :white
     end
   end
 
   def legal_move?(x, y, x_new, y_new)
-    piece_at(x, y) && correct_turn(x, y) && in_bounds(x_new, y_new) && !matching_colours(x, y, x_new, y_new)
+    !piece_at(x, y).nil? && correct_turn(x, y) && in_bounds(x_new, y_new) && !matching_colours(x, y, x_new, y_new)
   end
 
   def in_bounds(x, y)
-    x <= 7 && y <= 7 && x >= 0 && y >= 0
+    x <= (@size - 1) && y <= (@size - 1) && x >= 0 && y >= 0
   end
 
   def correct_turn(x, y)
@@ -129,5 +122,9 @@ class Board
       @taken << @columns[x][y]
     end
     @columns[x][y] = piece
+  end
+  
+  def delete_piece_at(x, y)
+    @columns[x][y] = nil
   end
 end

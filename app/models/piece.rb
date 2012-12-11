@@ -1,26 +1,33 @@
 class Piece
 	attr_accessor :colour, :board
 
-	def initialize(colour, board = nil)
+	def initialize(colour, board)
     @colour = colour
     @board = board
   end
 
-  def legal?(x, y, x_new, y_new)
-  	@board.legal_move?(x, y, x_new, y_new)
+  def legal?(x_new, y_new)
+  	@board.legal_move?(@x, @y, x_new, y_new)
   end
 
-  def taking?(x, y, x_new, y_new)
-    true
-  end
-
-  def move(x, y, x_new, y_new)
-    if legal?(x, y, x_new, y_new)
+  def move(x_new, y_new)
+    self.position unless @x && @y
+    if legal?(x_new, y_new)
       @board.set_piece_at(x_new, y_new, self)
-      @board.set_piece_at(x, y, nil)
-      @board.preserve_current_board
+      @board.delete_piece_at(@x, @y)
+      @x = x_new
+      @y = y_new
+      true
     else
       false
+    end
+  end
+  
+  def position
+    @board.columns.each_with_index do |column, i|
+      @x = i
+      @y = column.index(self)
+      return if @y
     end
   end
 end
