@@ -118,13 +118,20 @@ class Board
   end
 
   def set_piece_at(x, y, piece)
+    return true if @columns[x][y] == piece
     if @columns[x][y]
-      @taken << @columns[x][y]
+      take(x, y, piece)
+    else
+      @columns[x][y] = piece
     end
-    @columns[x][y] = piece
   end
   
   def delete_piece_at(x, y)
     @columns[x][y] = nil
+  end
+
+  def take(x, y, piece)
+    @taken << piece_at(x, y)
+    @columns[x][y] = piece
   end
 end

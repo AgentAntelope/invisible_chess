@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Bishop do
+describe King do
 	before :each do
 		@board = Board.new
 		@board.columns[3][3] = King.new(:white, @board)

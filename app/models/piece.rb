@@ -1,5 +1,5 @@
 class Piece
-	attr_accessor :colour, :board
+	attr_accessor :colour, :board, :x, :y
 
 	def initialize(colour, board)
     @colour = colour
@@ -17,6 +17,7 @@ class Piece
       @board.delete_piece_at(@x, @y)
       @x = x_new
       @y = y_new
+      @board.next_turn
       true
     else
       false
@@ -29,5 +30,9 @@ class Piece
       @y = column.index(self)
       return if @y
     end
+  end
+
+  def taking?
+    true
   end
 end
